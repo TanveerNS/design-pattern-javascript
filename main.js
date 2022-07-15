@@ -1,46 +1,76 @@
-function Employee(name) {
-    this.name = name;
+function Shop() {
+    this.construct = function (builder) {
+        builder.step1();
+        builder.step2();
+        return builder.get();
+    }
+}
+
+function CarBuilder() {
+    this.car = null;
+
+    this.step1 = function () {
+        this.car = new Car();
+    };
+
+    this.step2 = function () {
+        this.car.addParts();
+    };
+
+    this.get = function () {
+        return this.car;
+    };
+}
+
+function TruckBuilder() {
+    this.truck = null;
+
+    this.step1 = function () {
+        this.truck = new Truck();
+    };
+
+    this.step2 = function () {
+        this.truck.addParts();
+    };
+
+    this.get = function () {
+        return this.truck;
+    };
+}
+
+function Car() {
+    this.doors = 0;
+
+    this.addParts = function () {
+        this.doors = 4;
+    };
 
     this.say = function () {
-        console.log("I am employee " + name);
+        console.log("I am a " + this.doors + "-door car");
     };
 }
 
-function EmployeeFactory() {
+function Truck() {
+    this.doors = 0;
 
-    this.create = function (name) {
-        return new Employee(name);
+    this.addParts = function () {
+        this.doors = 2;
     };
-}
-
-function Vendor(name) {
-    this.name = name;
 
     this.say = function () {
-        console.log("I am vendor " + name);
-    };
-}
-
-function VendorFactory() {
-
-    this.create = function (name) {
-        return new Vendor(name);
+        console.log("I am a " + this.doors + "-door truck");
     };
 }
 
 function run() {
-    var persons = [];
-    var employeeFactory = new EmployeeFactory();
-    var vendorFactory = new VendorFactory();
+    var shop = new Shop();
+    var carBuilder = new CarBuilder();
+    var truckBuilder = new TruckBuilder();
+    var car = shop.construct(carBuilder);
+    var truck = shop.construct(truckBuilder);
 
-    persons.push(employeeFactory.create("Joan DiSilva"));
-    persons.push(employeeFactory.create("Tim O'Neill"));
-    persons.push(vendorFactory.create("Gerald Watson"));
-    persons.push(vendorFactory.create("Nicole McNight"));
-
-    for (var i = 0, len = persons.length; i < len; i++) {
-        persons[i].say();
-    }
+    car.say();
+    truck.say();
 }
 
 run();
