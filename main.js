@@ -1,76 +1,56 @@
-function Shop() {
-    this.construct = function (builder) {
-        builder.step1();
-        builder.step2();
-        return builder.get();
+var Factory = function () {
+    this.createEmployee = function (type) {
+        var employee;
+
+        if (type === "fulltime") {
+            employee = new FullTime();
+        } else if (type === "parttime") {
+            employee = new PartTime();
+        } else if (type === "temporary") {
+            employee = new Temporary();
+        } else if (type === "contractor") {
+            employee = new Contractor();
+        }
+
+        employee.type = type;
+
+        employee.say = function () {
+            console.log(this.type + ": rate " + this.hourly + "/hour");
+        }
+
+        return employee;
     }
 }
 
-function CarBuilder() {
-    this.car = null;
+var FullTime = function () {
+    this.hourly = "$12";
+};
 
-    this.step1 = function () {
-        this.car = new Car();
-    };
+var PartTime = function () {
+    this.hourly = "$11";
+};
 
-    this.step2 = function () {
-        this.car.addParts();
-    };
+var Temporary = function () {
+    this.hourly = "$10";
+};
 
-    this.get = function () {
-        return this.car;
-    };
-}
-
-function TruckBuilder() {
-    this.truck = null;
-
-    this.step1 = function () {
-        this.truck = new Truck();
-    };
-
-    this.step2 = function () {
-        this.truck.addParts();
-    };
-
-    this.get = function () {
-        return this.truck;
-    };
-}
-
-function Car() {
-    this.doors = 0;
-
-    this.addParts = function () {
-        this.doors = 4;
-    };
-
-    this.say = function () {
-        console.log("I am a " + this.doors + "-door car");
-    };
-}
-
-function Truck() {
-    this.doors = 0;
-
-    this.addParts = function () {
-        this.doors = 2;
-    };
-
-    this.say = function () {
-        console.log("I am a " + this.doors + "-door truck");
-    };
-}
+var Contractor = function () {
+    this.hourly = "$15";
+};
 
 function run() {
-    var shop = new Shop();
-    var carBuilder = new CarBuilder();
-    var truckBuilder = new TruckBuilder();
-    var car = shop.construct(carBuilder);
-    var truck = shop.construct(truckBuilder);
 
-    car.say();
-    truck.say();
+    var employees = [];
+    var factory = new Factory();
+
+    employees.push(factory.createEmployee("fulltime"));
+    employees.push(factory.createEmployee("parttime"));
+    employees.push(factory.createEmployee("temporary"));
+    employees.push(factory.createEmployee("contractor"));
+
+    for (var i = 0, len = employees.length; i < len; i++) {
+        employees[i].say();
+    }
 }
 
 run();
