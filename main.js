@@ -1,56 +1,36 @@
-var Factory = function () {
-    this.createEmployee = function (type) {
-        var employee;
+function CustomerPrototype(proto) {
+    this.proto = proto;
 
-        if (type === "fulltime") {
-            employee = new FullTime();
-        } else if (type === "parttime") {
-            employee = new PartTime();
-        } else if (type === "temporary") {
-            employee = new Temporary();
-        } else if (type === "contractor") {
-            employee = new Contractor();
-        }
+    this.clone = function () {
+        var customer = new Customer();
 
-        employee.type = type;
+        customer.first = proto.first;
+        customer.last = proto.last;
+        customer.status = proto.status;
 
-        employee.say = function () {
-            console.log(this.type + ": rate " + this.hourly + "/hour");
-        }
-
-        return employee;
-    }
+        return customer;
+    };
 }
 
-var FullTime = function () {
-    this.hourly = "$12";
-};
+function Customer(first, last, status) {
 
-var PartTime = function () {
-    this.hourly = "$11";
-};
+    this.first = first;
+    this.last = last;
+    this.status = status;
 
-var Temporary = function () {
-    this.hourly = "$10";
-};
-
-var Contractor = function () {
-    this.hourly = "$15";
-};
+    this.say = function () {
+        console.log("name: " + this.first + " " + this.last +
+            ", status: " + this.status);
+    };
+}
 
 function run() {
 
-    var employees = [];
-    var factory = new Factory();
+    var proto = new Customer("n/a", "n/a", "pending");
+    var prototype = new CustomerPrototype(proto);
 
-    employees.push(factory.createEmployee("fulltime"));
-    employees.push(factory.createEmployee("parttime"));
-    employees.push(factory.createEmployee("temporary"));
-    employees.push(factory.createEmployee("contractor"));
-
-    for (var i = 0, len = employees.length; i < len; i++) {
-        employees[i].say();
-    }
+    var customer = prototype.clone();
+    customer.say();
 }
 
 run();
