@@ -1,37 +1,29 @@
-function CustomerPrototype(proto) {
-    this.proto = proto;
+var Singleton = (function () {
+    var instance;
 
-    this.clone = function () {
-        var customer = new Customer();
+    function createInstance() {
+        var object = new Object("I am the instance");
+        return object;
+    }
 
-        customer.first = proto.first;
-        customer.last = proto.last;
-        customer.status = proto.status;
-
-        return customer;
+    return {
+        getInstance: function () {
+            if (!instance) {
+                instance = createInstance();
+            }
+            return instance;
+        }
     };
-}
-
-function Customer(first, last, status) {
-
-    this.first = first;
-    this.last = last;
-    this.status = status;
-
-    this.say = function () {
-        console.log("name: " + this.first + " " + this.last +
-            ", status: " + this.status);
-    };
-}
+})();
 
 function run() {
 
-    var proto = new Customer("n/a", "n/a", "pending");
-    var prototype = new CustomerPrototype(proto);
+    var instance1 = Singleton.getInstance();
+    var instance2 = Singleton.getInstance();
 
-    var customer = prototype.clone();
-    customer.say();
+    console.log("Same instance? " + (instance1 === instance2));
 }
+
 
 run();
 
