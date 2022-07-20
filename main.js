@@ -1,29 +1,55 @@
-var Singleton = (function () {
-    var instance;
 
-    function createInstance() {
-        var object = new Object("I am the instance");
-        return object;
+// old interface
+
+function Shipping() {
+    this.request = function (zipStart, zipEnd, weight) {
+        // ...
+        return "$49.75";
     }
+}
+
+// new interface
+
+function AdvancedShipping() {
+    this.login = function (credentials) { /* ... */ };
+    this.setStart = function (start) { /* ... */ };
+    this.setDestination = function (destination) { /* ... */ };
+    this.calculate = function (weight) { return "$39.50"; };
+}
+
+// adapter interface
+
+function ShippingAdapter(credentials) {
+    var shipping = new AdvancedShipping();
+
+    shipping.login(credentials);
 
     return {
-        getInstance: function () {
-            if (!instance) {
-                instance = createInstance();
-            }
-            return instance;
+        request: function (zipStart, zipEnd, weight) {
+            shipping.setStart(zipStart);
+            shipping.setDestination(zipEnd);
+            return shipping.calculate(weight);
         }
     };
-})();
+}
 
 function run() {
 
-    var instance1 = Singleton.getInstance();
-    var instance2 = Singleton.getInstance();
+    var shipping = new Shipping();
+    var credentials = { token: "30a8-6ee1" };
+    var adapter = new ShippingAdapter(credentials);
 
-    console.log("Same instance? " + (instance1 === instance2));
+    // original shipping object and interface
+
+    var cost = shipping.request("78701", "10010", "2 lbs");
+    console.log("Old cost: " + cost);
+
+    // new shipping object with adapted interface
+
+    cost = adapter.request("78701", "10010", "2 lbs");
+
+    console.log("New cost: " + cost);
 }
-
 
 run();
 
