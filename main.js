@@ -1,54 +1,54 @@
+// input devices
 
-// old interface
+var Gestures = function (output) {
+    this.output = output;
 
-function Shipping() {
-    this.request = function (zipStart, zipEnd, weight) {
-        // ...
-        return "$49.75";
-    }
-}
+    this.tap = function () { this.output.click(); }
+    this.swipe = function () { this.output.move(); }
+    this.pan = function () { this.output.drag(); }
+    this.pinch = function () { this.output.zoom(); }
+};
 
-// new interface
+var Mouse = function (output) {
+    this.output = output;
 
-function AdvancedShipping() {
-    this.login = function (credentials) { /* ... */ };
-    this.setStart = function (start) { /* ... */ };
-    this.setDestination = function (destination) { /* ... */ };
-    this.calculate = function (weight) { return "$39.50"; };
-}
+    this.click = function () { this.output.click(); }
+    this.move = function () { this.output.move(); }
+    this.down = function () { this.output.drag(); }
+    this.wheel = function () { this.output.zoom(); }
+};
 
-// adapter interface
+// output devices
 
-function ShippingAdapter(credentials) {
-    var shipping = new AdvancedShipping();
+var Screen = function () {
+    this.click = function () { console.log("Screen select"); }
+    this.move = function () { console.log("Screen move"); }
+    this.drag = function () { console.log("Screen drag"); }
+    this.zoom = function () { console.log("Screen zoom in"); }
+};
 
-    shipping.login(credentials);
-
-    return {
-        request: function (zipStart, zipEnd, weight) {
-            shipping.setStart(zipStart);
-            shipping.setDestination(zipEnd);
-            return shipping.calculate(weight);
-        }
-    };
-}
+var Audio = function () {
+    this.click = function () { console.log("Sound oink"); }
+    this.move = function () { console.log("Sound waves"); }
+    this.drag = function () { console.log("Sound screetch"); }
+    this.zoom = function () { console.log("Sound volume up"); }
+};
 
 function run() {
 
-    var shipping = new Shipping();
-    var credentials = { token: "30a8-6ee1" };
-    var adapter = new ShippingAdapter(credentials);
+    var screen = new Screen();
+    var audio = new Audio();
 
-    // original shipping object and interface
+    var hand = new Gestures(screen);
+    var mouse = new Mouse(audio);
 
-    var cost = shipping.request("78701", "10010", "2 lbs");
-    console.log("Old cost: " + cost);
+    hand.tap();
+    hand.swipe();
+    hand.pinch();
 
-    // new shipping object with adapted interface
-
-    cost = adapter.request("78701", "10010", "2 lbs");
-
-    console.log("New cost: " + cost);
+    mouse.click();
+    mouse.move();
+    mouse.wheel();
 }
 
 run();
