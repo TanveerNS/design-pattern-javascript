@@ -1,64 +1,33 @@
-var Node = function (name) {
-    this.children = [];
+
+var User = function (name) {
     this.name = name;
+
+    this.say = function () {
+        console.log("User: " + this.name);
+    };
 }
 
-Node.prototype = {
-    add: function (child) {
-        this.children.push(child);
-    },
+var DecoratedUser = function (user, street, city) {
+    this.user = user;
+    this.name = user.name;  // ensures interface stays the same
+    this.street = street;
+    this.city = city;
 
-    remove: function (child) {
-        var length = this.children.length;
-        for (var i = 0; i < length; i++) {
-            if (this.children[i] === child) {
-                this.children.splice(i, 1);
-                return;
-            }
-        }
-    },
-
-    getChild: function (i) {
-        return this.children[i];
-    },
-
-    hasChildren: function () {
-        return this.children.length > 0;
-    }
-}
-
-// recursively traverse a (sub)tree
-
-function traverse(indent, node) {
-    console.log(Array(indent++).join("--") + node.name);
-
-    for (var i = 0, len = node.children.length; i < len; i++) {
-        traverse(indent, node.getChild(i));
-    }
+    this.say = function () {
+        console.log("Decorated User: " + this.name + ", " +
+            this.street + ", " + this.city);
+    };
 }
 
 function run() {
-    var tree = new Node("root");
-    var left = new Node("left")
-    var right = new Node("right");
-    var leftleft = new Node("leftleft");
-    var leftright = new Node("leftright");
-    var rightleft = new Node("rightleft");
-    var rightright = new Node("rightright");
 
-    tree.add(left);
-    tree.add(right);
-    tree.remove(right);  // note: remove
-    tree.add(right);
+    var user = new User("Kelly");
+    user.say();
 
-    left.add(leftleft);
-    left.add(leftright);
-
-    right.add(rightleft);
-    right.add(rightright);
-
-    traverse(1, tree);
+    var decorated = new DecoratedUser(user, "Broadway", "New York");
+    decorated.say();
 }
+
 
 run();
 
