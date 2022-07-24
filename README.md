@@ -1,3 +1,2 @@
 # design-pattern-javascript
 
-## Bridge

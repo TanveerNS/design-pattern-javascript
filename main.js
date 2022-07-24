@@ -1,54 +1,63 @@
-// input devices
+var Node = function (name) {
+    this.children = [];
+    this.name = name;
+}
 
-var Gestures = function (output) {
-    this.output = output;
+Node.prototype = {
+    add: function (child) {
+        this.children.push(child);
+    },
 
-    this.tap = function () { this.output.click(); }
-    this.swipe = function () { this.output.move(); }
-    this.pan = function () { this.output.drag(); }
-    this.pinch = function () { this.output.zoom(); }
-};
+    remove: function (child) {
+        var length = this.children.length;
+        for (var i = 0; i < length; i++) {
+            if (this.children[i] === child) {
+                this.children.splice(i, 1);
+                return;
+            }
+        }
+    },
 
-var Mouse = function (output) {
-    this.output = output;
+    getChild: function (i) {
+        return this.children[i];
+    },
 
-    this.click = function () { this.output.click(); }
-    this.move = function () { this.output.move(); }
-    this.down = function () { this.output.drag(); }
-    this.wheel = function () { this.output.zoom(); }
-};
+    hasChildren: function () {
+        return this.children.length > 0;
+    }
+}
 
-// output devices
+// recursively traverse a (sub)tree
 
-var Screen = function () {
-    this.click = function () { console.log("Screen select"); }
-    this.move = function () { console.log("Screen move"); }
-    this.drag = function () { console.log("Screen drag"); }
-    this.zoom = function () { console.log("Screen zoom in"); }
-};
+function traverse(indent, node) {
+    console.log(Array(indent++).join("--") + node.name);
 
-var Audio = function () {
-    this.click = function () { console.log("Sound oink"); }
-    this.move = function () { console.log("Sound waves"); }
-    this.drag = function () { console.log("Sound screetch"); }
-    this.zoom = function () { console.log("Sound volume up"); }
-};
+    for (var i = 0, len = node.children.length; i < len; i++) {
+        traverse(indent, node.getChild(i));
+    }
+}
 
 function run() {
+    var tree = new Node("root");
+    var left = new Node("left")
+    var right = new Node("right");
+    var leftleft = new Node("leftleft");
+    var leftright = new Node("leftright");
+    var rightleft = new Node("rightleft");
+    var rightright = new Node("rightright");
 
-    var screen = new Screen();
-    var audio = new Audio();
+    tree.add(left);
+    tree.add(right);
+    tree.remove(right);  // note: remove
+    tree.add(right);
 
-    var hand = new Gestures(screen);
-    var mouse = new Mouse(audio);
+    left.add(leftleft);
+    left.add(leftright);
 
-    hand.tap();
-    hand.swipe();
-    hand.pinch();
+    right.add(rightleft);
+    right.add(rightright);
 
-    mouse.click();
-    mouse.move();
-    mouse.wheel();
+    traverse(1, tree);
 }
 
 run();
