@@ -1,51 +1,77 @@
-var Mortgage = function (name) {
-    this.name = name;
-}
 
-Mortgage.prototype = {
+function Flyweight(make, model, processor) {
+    this.make = make;
+    this.model = model;
+    this.processor = processor;
+};
 
-    applyFor: function (amount) {
-        // access multiple subsystems...
-        var result = "approved";
-        if (!new Bank().verify(this.name, amount)) {
-            result = "denied";
-        } else if (!new Credit().get(this.name)) {
-            result = "denied";
-        } else if (!new Background().check(this.name)) {
-            result = "denied";
+var FlyWeightFactory = (function () {
+    var flyweights = {};
+
+    return {
+
+        get: function (make, model, processor) {
+            if (!flyweights[make + model]) {
+                flyweights[make + model] =
+                    new Flyweight(make, model, processor);
+            }
+            return flyweights[make + model];
+        },
+
+        getCount: function () {
+            var count = 0;
+            for (var f in flyweights) count++;
+            return count;
         }
-        return this.name + " has been " + result +
-            " for a " + amount + " mortgage";
     }
+})();
+
+function ComputerCollection() {
+    var computers = {};
+    var count = 0;
+
+    return {
+        add: function (make, model, processor, memory, tag) {
+            computers[tag] =
+                new Computer(make, model, processor, memory, tag);
+            count++;
+        },
+
+        get: function (tag) {
+            return computers[tag];
+        },
+
+        getCount: function () {
+            return count;
+        }
+    };
 }
 
-var Bank = function () {
-    this.verify = function (name, amount) {
-        // complex logic ...
-        return true;
+var Computer = function (make, model, processor, memory, tag) {
+    this.flyweight = FlyWeightFactory.get(make, model, processor);
+    this.memory = memory;
+    this.tag = tag;
+    this.getMake = function () {
+        return this.flyweight.make;
     }
-}
-
-var Credit = function () {
-    this.get = function (name) {
-        // complex logic ...
-        return true;
-    }
-}
-
-var Background = function () {
-    this.check = function (name) {
-        // complex logic ...
-        return true;
-    }
+    // ...
 }
 
 function run() {
-    var mortgage = new Mortgage("Joan Templeton");
-    var result = mortgage.applyFor("$100,000");
+    var computers = new ComputerCollection();
 
-    console.log(result);
+    computers.add("Dell", "Studio XPS", "Intel", "5G", "Y755P");
+    computers.add("Dell", "Studio XPS", "Intel", "6G", "X997T");
+    computers.add("Dell", "Studio XPS", "Intel", "2G", "U8U80");
+    computers.add("Dell", "Studio XPS", "Intel", "2G", "NT777");
+    computers.add("Dell", "Studio XPS", "Intel", "2G", "0J88A");
+    computers.add("HP", "Envy", "Intel", "4G", "CNU883701");
+    computers.add("HP", "Envy", "Intel", "2G", "TXU003283");
+
+    console.log("Computers: " + computers.getCount());
+    console.log("Flyweights: " + FlyWeightFactory.getCount());
 }
+
 
 run();
 
