@@ -1,77 +1,62 @@
+function GeoCoder() {
 
-function Flyweight(make, model, processor) {
-    this.make = make;
-    this.model = model;
-    this.processor = processor;
-};
+    this.getLatLng = function (address) {
 
-var FlyWeightFactory = (function () {
-    var flyweights = {};
-
-    return {
-
-        get: function (make, model, processor) {
-            if (!flyweights[make + model]) {
-                flyweights[make + model] =
-                    new Flyweight(make, model, processor);
-            }
-            return flyweights[make + model];
-        },
-
-        getCount: function () {
-            var count = 0;
-            for (var f in flyweights) count++;
-            return count;
-        }
-    }
-})();
-
-function ComputerCollection() {
-    var computers = {};
-    var count = 0;
-
-    return {
-        add: function (make, model, processor, memory, tag) {
-            computers[tag] =
-                new Computer(make, model, processor, memory, tag);
-            count++;
-        },
-
-        get: function (tag) {
-            return computers[tag];
-        },
-
-        getCount: function () {
-            return count;
+        if (address === "Amsterdam") {
+            return "52.3700° N, 4.8900° E";
+        } else if (address === "London") {
+            return "51.5171° N, 0.1062° W";
+        } else if (address === "Paris") {
+            return "48.8742° N, 2.3470° E";
+        } else if (address === "Berlin") {
+            return "52.5233° N, 13.4127° E";
+        } else {
+            return "";
         }
     };
 }
 
-var Computer = function (make, model, processor, memory, tag) {
-    this.flyweight = FlyWeightFactory.get(make, model, processor);
-    this.memory = memory;
-    this.tag = tag;
-    this.getMake = function () {
-        return this.flyweight.make;
-    }
-    // ...
-}
+function GeoProxy() {
+    var geocoder = new GeoCoder();
+    var geocache = {};
+
+    return {
+        getLatLng: function (address) {
+            if (!geocache[address]) {
+                geocache[address] = geocoder.getLatLng(address);
+            }
+            console.log(address + ": " + geocache[address]);
+            return geocache[address];
+        },
+        getCount: function () {
+            var count = 0;
+            for (var code in geocache) { count++; }
+            return count;
+        }
+    };
+};
 
 function run() {
-    var computers = new ComputerCollection();
 
-    computers.add("Dell", "Studio XPS", "Intel", "5G", "Y755P");
-    computers.add("Dell", "Studio XPS", "Intel", "6G", "X997T");
-    computers.add("Dell", "Studio XPS", "Intel", "2G", "U8U80");
-    computers.add("Dell", "Studio XPS", "Intel", "2G", "NT777");
-    computers.add("Dell", "Studio XPS", "Intel", "2G", "0J88A");
-    computers.add("HP", "Envy", "Intel", "4G", "CNU883701");
-    computers.add("HP", "Envy", "Intel", "2G", "TXU003283");
+    var geo = new GeoProxy();
 
-    console.log("Computers: " + computers.getCount());
-    console.log("Flyweights: " + FlyWeightFactory.getCount());
+    // geolocation requests
+
+    geo.getLatLng("Paris");
+    geo.getLatLng("London");
+    geo.getLatLng("London");
+    geo.getLatLng("London");
+    geo.getLatLng("London");
+    geo.getLatLng("Amsterdam");
+    geo.getLatLng("Amsterdam");
+    geo.getLatLng("Amsterdam");
+    geo.getLatLng("Amsterdam");
+    geo.getLatLng("London");
+    geo.getLatLng("London");
+
+    console.log("\nCache size: " + geo.getCount());
+    
 }
-
 
 run();
 
