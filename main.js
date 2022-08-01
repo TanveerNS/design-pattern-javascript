@@ -1,61 +1,21 @@
-function GeoCoder() {
 
-    this.getLatLng = function (address) {
-
-        if (address === "Amsterdam") {
-            return "52.3700° N, 4.8900° E";
-        } else if (address === "London") {
-            return "51.5171° N, 0.1062° W";
-        } else if (address === "Paris") {
-            return "48.8742° N, 2.3470° E";
-        } else if (address === "Berlin") {
-            return "52.5233° N, 13.4127° E";
-        } else {
-            return "";
-        }
-    };
+var Request = function (amount) {
+    this.amount = amount;
+    console.log("Requested: $" + amount + "\n");
 }
 
-function GeoProxy() {
-    var geocoder = new GeoCoder();
-    var geocache = {};
-
-    return {
-        getLatLng: function (address) {
-            if (!geocache[address]) {
-                geocache[address] = geocoder.getLatLng(address);
-            }
-            console.log(address + ": " + geocache[address]);
-            return geocache[address];
-        },
-        getCount: function () {
-            var count = 0;
-            for (var code in geocache) { count++; }
-            return count;
-        }
-    };
-};
-
+Request.prototype = {
+    get: function (bill) {
+        var count = Math.floor(this.amount / bill);
+        this.amount -= count * bill;
+        console.log("Dispense " + count + " $" + bill + " bills");
+        return this;
+    }
+}
 function run() {
+    var request = new Request(378);
 
-    var geo = new GeoProxy();
-
-    // geolocation requests
-
-    geo.getLatLng("Paris");
-    geo.getLatLng("London");
-    geo.getLatLng("London");
-    geo.getLatLng("London");
-    geo.getLatLng("London");
-    geo.getLatLng("Amsterdam");
-    geo.getLatLng("Amsterdam");
-    geo.getLatLng("Amsterdam");
-    geo.getLatLng("Amsterdam");
-    geo.getLatLng("London");
-    geo.getLatLng("London");
-
-    console.log("\nCache size: " + geo.getCount());
-    
+    request.get(100).get(50).get(20).get(10).get(5).get(1);
 }
 
 run();
