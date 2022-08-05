@@ -1,64 +1,47 @@
-var Context = function (input) {
-    this.input = input;
-    this.output = 0;
+var Iterator = function (items) {
+    this.index = 0;
+    this.items = items;
 }
 
-Context.prototype = {
-    startsWith: function (str) {
-        return this.input.substr(0, str.length) === str;
-    }
-}
-
-var Expression = function (name, one, four, five, nine, multiplier) {
-    this.name = name;
-    this.one = one;
-    this.four = four;
-    this.five = five;
-    this.nine = nine;
-    this.multiplier = multiplier;
-}
-
-Expression.prototype = {
-    interpret: function (context) {
-        if (context.input.length == 0) {
-            return;
-        }
-        else if (context.startsWith(this.nine)) {
-            context.output += (9 * this.multiplier);
-            context.input = context.input.substr(2);
-        }
-        else if (context.startsWith(this.four)) {
-            context.output += (4 * this.multiplier);
-            context.input = context.input.substr(2);
-        }
-        else if (context.startsWith(this.five)) {
-            context.output += (5 * this.multiplier);
-            context.input = context.input.substr(1);
-        }
-        while (context.startsWith(this.one)) {
-            context.output += (1 * this.multiplier);
-            context.input = context.input.substr(1);
+Iterator.prototype = {
+    first: function () {
+        this.reset();
+        return this.next();
+    },
+    next: function () {
+        return this.items[this.index++];
+    },
+    hasNext: function () {
+        return this.index <= this.items.length;
+    },
+    reset: function () {
+        this.index = 0;
+    },
+    each: function (callback) {
+        for (var item = this.first(); this.hasNext(); item = this.next()) {
+            callback(item);
         }
     }
 }
 
 function run() {
-    var roman = "MCMXXVIII"
-    var context = new Context(roman);
-    var tree = [];
 
-    tree.push(new Expression("thousand", "M", " ", " ", " ", 1000));
-    tree.push(new Expression("hundred", "C", "CD", "D", "CM", 100));
-    tree.push(new Expression("ten", "X", "XL", "L", "XC", 10));
-    tree.push(new Expression("one", "I", "IV", "V", "IX", 1));
+    var items = ["one", 2, "circle", true, "Applepie"];
+    var iter = new Iterator(items);
 
-    for (var i = 0, len = tree.length; i < len; i++) {
-        tree[i].interpret(context);
+    // using for loop
+
+    for (var item = iter.first(); iter.hasNext(); item = iter.next()) {
+        console.log(item);
     }
+    console.log("");
 
-    console.log(roman + " = " + context.output);
+    // using Iterator's each method
+
+    iter.each(function (item) {
+        console.log(item);
+    });
 }
-
 
 run();
 
