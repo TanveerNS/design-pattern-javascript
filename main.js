@@ -1,76 +1,62 @@
-
-function add(x, y) { return x + y; }
-function sub(x, y) { return x - y; }
-function mul(x, y) { return x * y; }
-function div(x, y) { return x / y; }
-
-var Command = function (execute, undo, value) {
-    this.execute = execute;
-    this.undo = undo;
-    this.value = value;
+var Context = function (input) {
+    this.input = input;
+    this.output = 0;
 }
 
-var AddCommand = function (value) {
-    return new Command(add, sub, value);
-};
-
-var SubCommand = function (value) {
-    return new Command(sub, add, value);
-};
-
-var MulCommand = function (value) {
-    return new Command(mul, div, value);
-};
-
-var DivCommand = function (value) {
-    return new Command(div, mul, value);
-};
-
-var Calculator = function () {
-    var current = 0;
-    var commands = [];
-
-    function action(command) {
-        var name = command.execute.toString().substr(9, 3);
-        return name.charAt(0).toUpperCase() + name.slice(1);
+Context.prototype = {
+    startsWith: function (str) {
+        return this.input.substr(0, str.length) === str;
     }
+}
 
-    return {
-        execute: function (command) {
-            current = command.execute(current, command.value);
-            commands.push(command);
-            console.log(action(command) + ": " + command.value);
-        },
+var Expression = function (name, one, four, five, nine, multiplier) {
+    this.name = name;
+    this.one = one;
+    this.four = four;
+    this.five = five;
+    this.nine = nine;
+    this.multiplier = multiplier;
+}
 
-        undo: function () {
-            var command = commands.pop();
-            current = command.undo(current, command.value);
-            console.log("Undo " + action(command) + ": " + command.value);
-        },
-
-        getCurrentValue: function () {
-            return current;
+Expression.prototype = {
+    interpret: function (context) {
+        if (context.input.length == 0) {
+            return;
+        }
+        else if (context.startsWith(this.nine)) {
+            context.output += (9 * this.multiplier);
+            context.input = context.input.substr(2);
+        }
+        else if (context.startsWith(this.four)) {
+            context.output += (4 * this.multiplier);
+            context.input = context.input.substr(2);
+        }
+        else if (context.startsWith(this.five)) {
+            context.output += (5 * this.multiplier);
+            context.input = context.input.substr(1);
+        }
+        while (context.startsWith(this.one)) {
+            context.output += (1 * this.multiplier);
+            context.input = context.input.substr(1);
         }
     }
 }
 
 function run() {
+    var roman = "MCMXXVIII"
+    var context = new Context(roman);
+    var tree = [];
 
-    var calculator = new Calculator();
+    tree.push(new Expression("thousand", "M", " ", " ", " ", 1000));
+    tree.push(new Expression("hundred", "C", "CD", "D", "CM", 100));
+    tree.push(new Expression("ten", "X", "XL", "L", "XC", 10));
+    tree.push(new Expression("one", "I", "IV", "V", "IX", 1));
 
-    // issue commands
+    for (var i = 0, len = tree.length; i < len; i++) {
+        tree[i].interpret(context);
+    }
 
-    calculator.execute(new AddCommand(100));
-    calculator.execute(new SubCommand(24));
-    calculator.execute(new MulCommand(6));
-    calculator.execute(new DivCommand(2));
-
-    // reverse last two commands
-
-    calculator.undo();
-    calculator.undo();
-
-    console.log("\nValue: " + calculator.getCurrentValue());
+    console.log(roman + " = " + context.output);
 }
 
 
