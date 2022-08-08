@@ -28,9 +28,7 @@ function run() {
 
     var items = ["one", 2, "circle", true, "Applepie"];
     var iter = new Iterator(items);
-
-    // using for loop
-
+    // using for loop 
     for (var item = iter.first(); iter.hasNext(); item = iter.next()) {
         console.log(item);
     }
@@ -43,5 +41,5 @@ function run() {
     });
 }
 
-run();
 
+run();
