@@ -1,45 +1,59 @@
-var Iterator = function (items) {
-    this.index = 0;
-    this.items = items;
-}
+var Participant = function (name) {
+    this.name = name;
+    this.chatroom = null;
+};
 
-Iterator.prototype = {
-    first: function () {
-        this.reset();
-        return this.next();
+Participant.prototype = {
+    send: function (message, to) {
+        this.chatroom.send(message, this, to);
     },
-    next: function () {
-        return this.items[this.index++];
-    },
-    hasNext: function () {
-        return this.index <= this.items.length;
-    },
-    reset: function () {
-        this.index = 0;
-    },
-    each: function (callback) {
-        for (var item = this.first(); this.hasNext(); item = this.next()) {
-            callback(item);
-        }
+    receive: function (message, from) {
+        console.log(from.name + " to " + this.name + ": " + message);
     }
-}
+};
+
+var Chatroom = function () {
+    var participants = {};
+
+    return {
+
+        register: function (participant) {
+            participants[participant.name] = participant;
+            participant.chatroom = this;
+        },
+
+        send: function (message, from, to) {
+            if (to) {                      // single message
+                to.receive(message, from);
+            } else {                       // broadcast message
+                for (key in participants) {
+                    if (participants[key] !== from) {
+                        participants[key].receive(message, from);
+                    }
+                }
+            }
+        }
+    };
+};
 
 function run() {
 
-    var items = ["one", 2, "circle", true, "Applepie"];
-    var iter = new Iterator(items);
-    // using for loop 
-    for (var item = iter.first(); iter.hasNext(); item = iter.next()) {
-        console.log(item);
-    }
-    console.log("");
+    var yoko = new Participant("Yoko");
+    var john = new Participant("John");
+    var paul = new Participant("Paul");
+    var ringo = new Participant("Ringo");
 
-    // using Iterator's each method
+    var chatroom = new Chatroom();
+    chatroom.register(yoko);
+    chatroom.register(john);
+    chatroom.register(paul);
+    chatroom.register(ringo);
 
-    iter.each(function (item) {
-        console.log(item);
-    });
+    yoko.send("All you need is love.");
+    yoko.send("I love you John.");
+    john.send("Hey, no need to broadcast", yoko);
+    paul.send("Ha, I heard that!");
+    ringo.send("Paul, what do you think?", paul);
 }
-
 
 run();
