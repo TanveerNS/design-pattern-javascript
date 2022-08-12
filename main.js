@@ -1,59 +1,61 @@
-var Participant = function (name) {
+var Person = function (name, street, city, state) {
     this.name = name;
-    this.chatroom = null;
-};
+    this.street = street;
+    this.city = city;
+    this.state = state;
+}
 
-Participant.prototype = {
-    send: function (message, to) {
-        this.chatroom.send(message, this, to);
+Person.prototype = {
+
+    hydrate: function () {
+        var memento = JSON.stringify(this);
+        return memento;
     },
-    receive: function (message, from) {
-        console.log(from.name + " to " + this.name + ": " + message);
+
+    dehydrate: function (memento) {
+        var m = JSON.parse(memento);
+        this.name = m.name;
+        this.street = m.street;
+        this.city = m.city;
+        this.state = m.state;
     }
-};
+}
 
-var Chatroom = function () {
-    var participants = {};
+var CareTaker = function () {
+    this.mementos = {};
 
-    return {
+    this.add = function (key, memento) {
+        this.mementos[key] = memento;
+    },
 
-        register: function (participant) {
-            participants[participant.name] = participant;
-            participant.chatroom = this;
-        },
-
-        send: function (message, from, to) {
-            if (to) {                      // single message
-                to.receive(message, from);
-            } else {                       // broadcast message
-                for (key in participants) {
-                    if (participants[key] !== from) {
-                        participants[key].receive(message, from);
-                    }
-                }
-            }
+        this.get = function (key) {
+            return this.mementos[key];
         }
-    };
-};
+}
 
 function run() {
 
-    var yoko = new Participant("Yoko");
-    var john = new Participant("John");
-    var paul = new Participant("Paul");
-    var ringo = new Participant("Ringo");
+    var mike = new Person("Mike Foley", "1112 Main", "Dallas", "TX");
+    var john = new Person("John Wang", "48th Street", "San Jose", "CA");
+    var caretaker = new CareTaker();
 
-    var chatroom = new Chatroom();
-    chatroom.register(yoko);
-    chatroom.register(john);
-    chatroom.register(paul);
-    chatroom.register(ringo);
+    // save state
 
-    yoko.send("All you need is love.");
-    yoko.send("I love you John.");
-    john.send("Hey, no need to broadcast", yoko);
-    paul.send("Ha, I heard that!");
-    ringo.send("Paul, what do you think?", paul);
+    caretaker.add(1, mike.hydrate());
+    caretaker.add(2, john.hydrate());
+
+    // mess up their names
+
+    mike.name = "King Kong";
+    john.name = "Superman";
+
+    // restore original state
+
+    mike.dehydrate(caretaker.get(1));
+    john.dehydrate(caretaker.get(2));
+
+    console.log(mike.name);
+    console.log(john.name);
 }
 
 run();
