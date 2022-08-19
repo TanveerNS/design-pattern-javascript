@@ -1,50 +1,45 @@
-var TrafficLight = function () {
-    var count = 0;
-    var currentState = new Red(this);
-
-    this.change = function (state) {
-        // limits number of changes
-        if (count++ >= 10) return;
-        currentState = state;
-        currentState.go();
-    };
-
-    this.start = function () {
-        currentState.go();
-    };
+function Click() {
+    this.handlers = [];  // observers
 }
 
-var Red = function (light) {
-    this.light = light;
+Click.prototype = {
 
-    this.go = function () {
-        console.log("Red --> for 1 minute");
-        light.change(new Green(light));
+    subscribe: function (fn) {
+        this.handlers.push(fn);
+    },
+
+    unsubscribe: function (fn) {
+        this.handlers = this.handlers.filter(
+            function (item) {
+                if (item !== fn) {
+                    return item;
+                }
+            }
+        );
+    },
+
+    fire: function (o, thisObj) {
+        var scope = thisObj || window;
+        this.handlers.forEach(function (item) {
+            item.call(scope, o);
+        });
     }
-};
-
-var Yellow = function (light) {
-    this.light = light;
-
-    this.go = function () {
-        console.log("Yellow --> for 10 seconds");
-        light.change(new Red(light));
-    }
-};
-
-var Green = function (light) {
-    this.light = light;
-
-    this.go = function () {
-        console.log("Green --> for 1 minute");
-        light.change(new Yellow(light));
-    }
-};
+}
 
 function run() {
 
-    var light = new TrafficLight();
-    light.start();
+    var clickHandler = function (item) {
+        console.log("fired: " + item);
+    };
+
+    var click = new Click();
+
+    click.subscribe(clickHandler);
+    click.fire('event #1');
+    click.unsubscribe(clickHandler);
+    click.fire('event #2');
+    click.subscribe(clickHandler);
+    click.fire('event #3');
 }
 
 run();
