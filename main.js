@@ -1,45 +1,56 @@
-function Click() {
-    this.handlers = [];  // observers
-}
+var Shipping = function () {
+    this.company = "";
+};
 
-Click.prototype = {
-
-    subscribe: function (fn) {
-        this.handlers.push(fn);
+Shipping.prototype = {
+    setStrategy: function (company) {
+        this.company = company;
     },
 
-    unsubscribe: function (fn) {
-        this.handlers = this.handlers.filter(
-            function (item) {
-                if (item !== fn) {
-                    return item;
-                }
-            }
-        );
-    },
-
-    fire: function (o, thisObj) {
-        var scope = thisObj || window;
-        this.handlers.forEach(function (item) {
-            item.call(scope, o);
-        });
+    calculate: function (package) {
+        return this.company.calculate(package);
     }
-}
+};
+
+var UPS = function () {
+    this.calculate = function (package) {
+        // calculations...
+        return "$45.95";
+    }
+};
+
+var USPS = function () {
+    this.calculate = function (package) {
+        // calculations...
+        return "$39.40";
+    }
+};
+
+var Fedex = function () {
+    this.calculate = function (package) {
+        // calculations...
+        return "$43.20";
+    }
+};
 
 function run() {
 
-    var clickHandler = function (item) {
-        console.log("fired: " + item);
-    };
+    var package = { from: "76712", to: "10012", weigth: "lkg" };
 
-    var click = new Click();
+    // the 3 strategies
 
-    click.subscribe(clickHandler);
-    click.fire('event #1');
-    click.unsubscribe(clickHandler);
-    click.fire('event #2');
-    click.subscribe(clickHandler);
-    click.fire('event #3');
+    var ups = new UPS();
+    var usps = new USPS();
+    var fedex = new Fedex();
+
+    var shipping = new Shipping();
+
+    shipping.setStrategy(ups);
+    console.log("UPS Strategy: " + shipping.calculate(package));
+    shipping.setStrategy(usps);
+    console.log("USPS Strategy: " + shipping.calculate(package));
+    shipping.setStrategy(fedex);
+    console.log("Fedex Strategy: " + shipping.calculate(package));
 }
 
 run();
