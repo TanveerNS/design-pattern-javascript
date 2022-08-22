@@ -1,56 +1,36 @@
-var Shipping = function () {
-    this.company = "";
-};
-
-Shipping.prototype = {
-    setStrategy: function (company) {
-        this.company = company;
-    },
-
-    calculate: function (package) {
-        return this.company.calculate(package);
+var datastore = {
+    process: function () {
+        this.connect();
+        this.select();
+        this.disconnect();
+        return true;
     }
 };
 
-var UPS = function () {
-    this.calculate = function (package) {
-        // calculations...
-        return "$45.95";
-    }
-};
-
-var USPS = function () {
-    this.calculate = function (package) {
-        // calculations...
-        return "$39.40";
-    }
-};
-
-var Fedex = function () {
-    this.calculate = function (package) {
-        // calculations...
-        return "$43.20";
-    }
-};
+function inherit(proto) {
+    var F = function () { };
+    F.prototype = proto;
+    return new F();
+}
 
 function run() {
+    var mySql = inherit(datastore);
 
-    var package = { from: "76712", to: "10012", weigth: "lkg" };
+    // implement template steps
 
-    // the 3 strategies
+    mySql.connect = function () {
+        console.log("MySQL: connect step");
+    };
 
-    var ups = new UPS();
-    var usps = new USPS();
-    var fedex = new Fedex();
+    mySql.select = function () {
+        console.log("MySQL: select step");
+    };
 
-    var shipping = new Shipping();
+    mySql.disconnect = function () {
+        console.log("MySQL: disconnect step");
+    };
 
-    shipping.setStrategy(ups);
-    console.log("UPS Strategy: " + shipping.calculate(package));
-    shipping.setStrategy(usps);
-    console.log("USPS Strategy: " + shipping.calculate(package));
-    shipping.setStrategy(fedex);
-    console.log("Fedex Strategy: " + shipping.calculate(package));
+    mySql.process();
 }
 
 run();
